@@ -11,6 +11,8 @@ namespace Assets.Scripts
         protected AbstractPathMind PathController;
         public BoardManager BoardManager { get; set; }
         protected CellInfo currentTarget;
+
+        bool flag = false;
        
         void Awake()
         {
@@ -24,12 +26,17 @@ namespace Assets.Scripts
 
         }
 
+        void Start()
+        { 
+        
+        }
+
         void Update()
         {
             if (BoardManager == null) return;
-            if (LocomotionController.MoveNeed)
+            if (LocomotionController.MoveNeed && !flag)
             {
-
+                // flag = true;
                 var boardClone = (BoardInfo)BoardManager.boardInfo.Clone();
                 LocomotionController.SetNewDirection(PathController.GetNextMove(boardClone,LocomotionController.CurrentEndPosition(),new [] {this.currentTarget}));
             }
