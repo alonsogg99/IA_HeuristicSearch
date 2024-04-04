@@ -6,11 +6,23 @@ using System.Runtime.InteropServices;
 
 public class OfflineMind : AbstractPathMind
 {
-    public Locomotion.MoveDirection ChoosePath(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals)
+    BoardInfo board = null;
+    CellInfo current = null;
+    CellInfo[] goal = null;
+
+    bool goal_found  = false;
+    bool first_time = false;
+
+    void Start()
+    {
+        Debug.Log("Start");
+    }
+
+    public Node ChoosePath(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals)
     {
         // List<Locomotion.MoveDirection> reponse = new List<Locomotion.MoveDirection>();
 
-        bool goal_found = false;
+        /*bool goal_found = false;
 
         float bestOption = Mathf.Infinity;
         Vector2 bestPos = Vector2.zero;
@@ -129,9 +141,77 @@ public class OfflineMind : AbstractPathMind
 
             // Debug
             goal_found = true;
+        }*/
+
+        // currentPos.WalkableNeighbours(boardInfo);
+
+        List<Node> nodeResponse = new List<Node>();
+
+        this.board = boardInfo;
+        this.current = currentPos;  
+        this.goal = goals;
+        int j = 0;
+
+        // nodeResponse.Add(this);
+        CellInfo[] firstSteps = currentPos.WalkableNeighbours(boardInfo);
+        for (int i = 0; i < firstSteps.Length; i++)
+        {
+            if (firstSteps[i] != null)
+            {
+                // El indice indica que movimiento tuvo que tomar para poder llegar a el
+                /*
+                 * 0 = UP
+                 * 1 = RIGHT
+                 * 2 = DOWN
+                 * 3 = LEFT
+                 */
+
+                nodeResponse.Add(new Node(firstSteps[i], current, i));
+            }
         }
 
-        return Locomotion.MoveDirection.None;
+        while (!goal_found && nodeResponse.Count > 0)
+        {
+            Node openNode = nodeResponse[0];
+            if (openNode.cellInfo != null)
+            {
+                if (openNode.cellInfo == goals[0])
+                {
+                    Debug.Log("Found");
+                    goal_found = true;
+                    return openNode;
+                }
+                else
+                {
+                    CellInfo[] nextCells = openNode.cellInfo.WalkableNeighbours(boardInfo);
+                    for (int i = 0; i < nextCells.Length; i++)
+                    {
+                        if (nextCells[i] != null)
+                        {
+                            nodeResponse.Add(new Node(nextCells[i], openNode.cellInfo, i));
+                            Debug.Log("Next cell " + nextCells[i].CellId);
+                        }
+                    }
+                    nodeResponse.Remove(openNode);
+                }
+                j++;
+            }
+            else
+            {
+                nodeResponse.Remove(openNode);
+            }
+
+            //Debug
+            if (j > 15)
+            {
+                goal_found = true;
+            }
+
+            // Si no hago esto, se queda muerto el unity, en teoria ya deberia de estar pero no corre.
+        }
+
+
+        return null;
     }
 
     public override Locomotion.MoveDirection GetNextMove(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals)
@@ -140,12 +220,18 @@ public class OfflineMind : AbstractPathMind
 
         // Debug.Log("goals end " + goals[0].CellId);
 
-        Debug.Log("current pos " + currentPos.CellId);
-        Locomotion.MoveDirection respuesta = ChoosePath(boardInfo, currentPos, goals);
+        // Debug.Log("current pos " + currentPos.CellId);
+        // Locomotion.MoveDirection respuesta = ChoosePath(boardInfo, currentPos, goals);
 
-        Debug.Log("Respuesta " +  respuesta);
+        // Debug.Log("Respuesta " +  respuesta);
 
-        return respuesta;
+        // return respuesta;
+
+        if (!first_time)
+        {
+            first_time = true;
+            ChoosePath(boardInfo, currentPos, goals);
+        }
 
         /*var val = Random.Range(0, 4);
         if (val == 0) return Locomotion.MoveDirection.Up;
@@ -153,6 +239,8 @@ public class OfflineMind : AbstractPathMind
         if (val == 2) return Locomotion.MoveDirection.Left;
         return Locomotion.MoveDirection.Right;*/
 
-        // return Locomotion.MoveDirection.None;
+        // Debug.Log("GetNextMove");
+
+        return Locomotion.MoveDirection.None;
     }
 }
