@@ -138,11 +138,23 @@ namespace Assets.Scripts.DataStructures
         private void LayoutGoalAtRandom(bool forPlanner)
         {
             var emptyCells = this.EmptyCells;
-            var goalCell = emptyCells[Random.Range(0, emptyCells.Count)];
-            goalCell.ItemInCell = new PlaceableItem("Goal", PlaceableItem.ItemType.Goal);
-            if (forPlanner)
+            bool placedGoal = false;
+            while (!placedGoal)
             {
-                GeneratePrerequisites(goalCell.ItemInCell);
+                var goalCell = emptyCells[Random.Range(0, emptyCells.Count)];
+                if (!goalCell.Walkable)
+                {
+                    continue;
+                }
+                else
+                {
+                    goalCell.ItemInCell = new PlaceableItem("Goal", PlaceableItem.ItemType.Goal);
+                    placedGoal = true;
+                    if (forPlanner)
+                    {
+                        GeneratePrerequisites(goalCell.ItemInCell);
+                    }
+                }
             }
         }
         private void GeneratePrerequisites(PlaceableItem item)

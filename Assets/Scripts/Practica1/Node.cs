@@ -8,26 +8,26 @@ namespace Assets.Scripts.DataStructures
     public class Node : ICloneable
     {
         public CellInfo cellInfo { get; }
-        public CellInfo parentCell { get; }
+        public Node parentNode { get; }
         public int direction { get; }
 
-        public Node(CellInfo cell, CellInfo parent, int move)
+        public Node(CellInfo cell, Node parent, int move)
         {
             this.cellInfo = cell;
-            this.parentCell = parent;
+            this.parentNode= parent;
             this.direction = move;
         }
 
         public object Clone()
         {
-            var result = new Node(this.cellInfo, this.parentCell, this.direction);
+            var result = new Node(this.cellInfo, this.parentNode, this.direction);
 
             return result;
         }
 
         public override string ToString()
         {
-            return "currentInfo: " + cellInfo.CellId + " parentInfo: " + parentCell.CellId + " direction: " + direction;
+            return "currentInfo: " + cellInfo.CellId + " parentInfo: " + parentNode.cellInfo.CellId + " direction: " + direction;
         }
     }
 }

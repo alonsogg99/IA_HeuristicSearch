@@ -6,16 +6,16 @@ using System.Runtime.InteropServices;
 
 public class OfflineMind : AbstractPathMind
 {
-    BoardInfo board = null;
-    CellInfo current = null;
-    CellInfo[] goal = null;
+    Node finalNode = null;
+    Node parentNode = null;
 
     bool goal_found  = false;
     bool first_time = false;
 
     void Start()
     {
-        Debug.Log("Start");
+        // Debug.Log("Start");
+        finalNode = null;
     }
 
     public Node ChoosePath(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals)
@@ -24,132 +24,129 @@ public class OfflineMind : AbstractPathMind
 
         /*bool goal_found = false;
 
-        float bestOption = Mathf.Infinity;
-        Vector2 bestPos = Vector2.zero;
+       float bestOption = Mathf.Infinity;
+       Vector2 bestPos = Vector2.zero;
 
-        Vector2 editablePos = Vector2.zero;
+       Vector2 editablePos = Vector2.zero;
 
-        Vector2 positionGoal = goals[0].GetPosition;
+       Vector2 positionGoal = goals[0].GetPosition;
 
-        editablePos.x = currentPos.ColumnId;
-        editablePos.y = currentPos.RowId;
+       editablePos.x = currentPos.ColumnId;
+       editablePos.y = currentPos.RowId;
 
-        while (!goal_found)
-        {
-            if (bestOption < Mathf.Infinity)
-            {
-                bestOption = Mathf.Infinity;
-            }
+       while (!goal_found)
+       {
+           if (bestOption < Mathf.Infinity)
+           {
+               bestOption = Mathf.Infinity;
+           }
 
-            if (bestPos != Vector2.zero)
-            {
-                editablePos.x += bestPos.x;
-                editablePos.y += bestPos.y;
-                bestPos = Vector2.zero;
-            }
+           if (bestPos != Vector2.zero)
+           {
+               editablePos.x += bestPos.x;
+               editablePos.y += bestPos.y;
+               bestPos = Vector2.zero;
+           }
 
-            for (int i = -1; i < 2; i++)
-            {
-                if (editablePos.x + i > -1 && editablePos.x + i < boardInfo.NumColumns)
-                {
-                    if (boardInfo.CellInfos[(int)editablePos.x + i, (int)editablePos.y].Walkable)
-                    {
-                        Vector2 positionToBe = boardInfo.CellInfos[(int)editablePos.x + i,(int) editablePos.y].GetPosition;
+           for (int i = -1; i < 2; i++)
+           {
+               if (editablePos.x + i > -1 && editablePos.x + i < boardInfo.NumColumns)
+               {
+                   if (boardInfo.CellInfos[(int)editablePos.x + i, (int)editablePos.y].Walkable)
+                   {
+                       Vector2 positionToBe = boardInfo.CellInfos[(int)editablePos.x + i,(int) editablePos.y].GetPosition;
 
-                        float option = Vector2.Distance(positionToBe, positionGoal);
+                       float option = Vector2.Distance(positionToBe, positionGoal);
 
-                        Debug.Log("I");
-                        Debug.Log("CellToBe " + boardInfo.CellInfos[(int)editablePos.x + i, (int)editablePos.y].CellId);
-                        Debug.Log("option " + i + " : " + option);
+                       Debug.Log("I");
+                       Debug.Log("CellToBe " + boardInfo.CellInfos[(int)editablePos.x + i, (int)editablePos.y].CellId);
+                       Debug.Log("option " + i + " : " + option);
 
-                        if (option < bestOption)
-                        {
-                            bestOption = option;
-                            Debug.Log("Best Option " + i);
-                            bestPos = new Vector2(i, 0);
-                        }
-                        else if (option == 0)
-                        {
-                            Debug.Log("Found");
-                            goal_found = true;
-                        }
-                    }
-                    else
-                    {
-                        Debug.Log("Wall");
-                    }
-                }
-            }
-            
-            for (int j = -1; j < 2; j++)
-            {
-                if (editablePos.y + j > -1 && editablePos.y + j < boardInfo.NumColumns)
-                {
-                    if (boardInfo.CellInfos[(int)editablePos.x, (int)editablePos.y + j].Walkable)
-                    {
-                        Vector2 positionToBe = boardInfo.CellInfos[(int) editablePos.x, (int)editablePos.y + j].GetPosition;
+                       if (option < bestOption)
+                       {
+                           bestOption = option;
+                           Debug.Log("Best Option " + i);
+                           bestPos = new Vector2(i, 0);
+                       }
+                       else if (option == 0)
+                       {
+                           Debug.Log("Found");
+                           goal_found = true;
+                       }
+                   }
+                   else
+                   {
+                       Debug.Log("Wall");
+                   }
+               }
+           }
 
-                        float option = Vector2.Distance(positionToBe, positionGoal);
+           for (int j = -1; j < 2; j++)
+           {
+               if (editablePos.y + j > -1 && editablePos.y + j < boardInfo.NumColumns)
+               {
+                   if (boardInfo.CellInfos[(int)editablePos.x, (int)editablePos.y + j].Walkable)
+                   {
+                       Vector2 positionToBe = boardInfo.CellInfos[(int) editablePos.x, (int)editablePos.y + j].GetPosition;
 
-                        Debug.Log("J");
-                        Debug.Log("CellToBe " + boardInfo.CellInfos[(int)editablePos.x, (int)editablePos.y + j].CellId);
-                        Debug.Log("option " + j + " : " + option);
+                       float option = Vector2.Distance(positionToBe, positionGoal);
 
-                        if (option < bestOption)
-                        {
-                            bestOption = option;
-                            Debug.Log("Best Option " + j);
-                            bestPos = new Vector2(0, j);
-                        }
-                        else if (option == 0)
-                        {
-                            Debug.Log("Found");
-                            goal_found = true;
-                        }
-                    }
-                    else
-                    {
-                        Debug.Log("Wall");
-                    }
-                }
-            }
+                       Debug.Log("J");
+                       Debug.Log("CellToBe " + boardInfo.CellInfos[(int)editablePos.x, (int)editablePos.y + j].CellId);
+                       Debug.Log("option " + j + " : " + option);
 
-            if (bestPos == new Vector2(1, 0))
-            {
-                // reponse.Add(Locomotion.MoveDirection.Up);
-                Debug.Log("Add reponse Up");
-                return Locomotion.MoveDirection.Up;
-            }
-            else if (bestPos == new Vector2 (-1, 0))
-            {
-                // reponse.Add(Locomotion.MoveDirection.Down);
-                Debug.Log("Add reponse Down");
-                return Locomotion.MoveDirection.Down;
-            }
-            else if (bestPos == new Vector2 (0, 1))
-            {
-                // reponse.Add(Locomotion.MoveDirection.Right);
-                Debug.Log("Add reponse Right");
-                return Locomotion.MoveDirection.Right;
-            }
-            else if (bestPos == new Vector2 (0, -1))
-            {
-                //reponse.Add(Locomotion.MoveDirection.Left);
-                Debug.Log("Add reponse Left");
-                return Locomotion.MoveDirection.Left;
-            }
+                       if (option < bestOption)
+                       {
+                           bestOption = option;
+                           Debug.Log("Best Option " + j);
+                           bestPos = new Vector2(0, j);
+                       }
+                       else if (option == 0)
+                       {
+                           Debug.Log("Found");
+                           goal_found = true;
+                       }
+                   }
+                   else
+                   {
+                       Debug.Log("Wall");
+                   }
+               }
+           }
 
-            // Debug
-            goal_found = true;
-        }*/
+           if (bestPos == new Vector2(1, 0))
+           {
+               // reponse.Add(Locomotion.MoveDirection.Up);
+               Debug.Log("Add reponse Up");
+               return Locomotion.MoveDirection.Up;
+           }
+           else if (bestPos == new Vector2 (-1, 0))
+           {
+               // reponse.Add(Locomotion.MoveDirection.Down);
+               Debug.Log("Add reponse Down");
+               return Locomotion.MoveDirection.Down;
+           }
+           else if (bestPos == new Vector2 (0, 1))
+           {
+               // reponse.Add(Locomotion.MoveDirection.Right);
+               Debug.Log("Add reponse Right");
+               return Locomotion.MoveDirection.Right;
+           }
+           else if (bestPos == new Vector2 (0, -1))
+           {
+               //reponse.Add(Locomotion.MoveDirection.Left);
+               Debug.Log("Add reponse Left");
+               return Locomotion.MoveDirection.Left;
+           }
+
+           // Debug
+           goal_found = true;
+       }*/
 
         // currentPos.WalkableNeighbours(boardInfo);
 
         List<Node> nodeResponse = new List<Node>();
 
-        this.board = boardInfo;
-        this.current = currentPos;  
-        this.goal = goals;
         int j = 0;
 
         // nodeResponse.Add(this);
@@ -166,7 +163,7 @@ public class OfflineMind : AbstractPathMind
                  * 3 = LEFT
                  */
 
-                nodeResponse.Add(new Node(firstSteps[i], current, i));
+                nodeResponse.Add(new Node(firstSteps[i], new Node(currentPos, null, -1), i));
             }
         }
 
@@ -175,9 +172,10 @@ public class OfflineMind : AbstractPathMind
             Node openNode = nodeResponse[0];
             if (openNode.cellInfo != null)
             {
+                // Debug.Log("Current Pos " + openNode.cellInfo.CellId);
                 if (openNode.cellInfo == goals[0])
                 {
-                    Debug.Log("Found");
+                    // Debug.Log("Found");
                     goal_found = true;
                     return openNode;
                 }
@@ -188,8 +186,7 @@ public class OfflineMind : AbstractPathMind
                     {
                         if (nextCells[i] != null)
                         {
-                            nodeResponse.Add(new Node(nextCells[i], openNode.cellInfo, i));
-                            Debug.Log("Next cell " + nextCells[i].CellId);
+                            nodeResponse.Add(new Node(nextCells[i], openNode, i));
                         }
                     }
                     nodeResponse.Remove(openNode);
@@ -200,17 +197,8 @@ public class OfflineMind : AbstractPathMind
             {
                 nodeResponse.Remove(openNode);
             }
-
-            //Debug
-            if (j > 15)
-            {
-                goal_found = true;
-            }
-
             // Si no hago esto, se queda muerto el unity, en teoria ya deberia de estar pero no corre.
         }
-
-
         return null;
     }
 
@@ -230,7 +218,38 @@ public class OfflineMind : AbstractPathMind
         if (!first_time)
         {
             first_time = true;
-            ChoosePath(boardInfo, currentPos, goals);
+            // Debug.Log("Goal: " + goals[0].CellId + " Is Walkable?: " + goals[0].Walkable);
+            finalNode = ChoosePath(boardInfo, currentPos, goals);
+        }
+
+        bool found_move = false;
+        if (finalNode != null)
+        {
+            while (!found_move)
+            {
+
+                if (parentNode == null)
+                {
+                    parentNode = finalNode;
+                }
+                else
+                {
+                    parentNode = parentNode.parentNode;
+                }
+
+                if (parentNode != null && parentNode.parentNode != null && parentNode.parentNode.cellInfo != null)
+                {
+                    if (parentNode.parentNode.cellInfo.CellId == currentPos.CellId)
+                    {
+                        found_move = true;
+                        if (parentNode.direction == 0) return Locomotion.MoveDirection.Up;
+                        else if (parentNode.direction == 1) return Locomotion.MoveDirection.Right;
+                        else if (parentNode.direction == 2) return Locomotion.MoveDirection.Down;
+                        else if (parentNode.direction == 3) return Locomotion.MoveDirection.Left;
+                        else Debug.LogError("Hay algo mal bro");
+                    }
+                }
+            }
         }
 
         /*var val = Random.Range(0, 4);
