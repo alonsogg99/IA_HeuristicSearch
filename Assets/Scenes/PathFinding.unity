@@ -291,6 +291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1faf82467ff9dca47947f3b5801cc375, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Algorith_Option: 0
 --- !u!850595691 &1155724138
 LightingSettings:
   m_ObjectHideFlags: 0
@@ -384,7 +385,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameManager: {fileID: 198952, guid: 1f54754c41c64a04aac6945bc71af6ca, type: 3}
   Planner: 0
-  seed: 2022
+  seed: 2020
   numEnemies: 0
 --- !u!4 &1401979017
 Transform:

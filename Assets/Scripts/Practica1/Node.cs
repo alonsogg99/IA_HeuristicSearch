@@ -8,14 +8,20 @@ namespace Assets.Scripts.DataStructures
     public class Node : ICloneable
     {
         public CellInfo cellInfo { get; }
-        public Node parentNode { get; }
-        public int direction { get; }
+        public Node parentNode { get; set; }
+        public int direction { get; set; }
+        public float G { get; set; }
+        public float H { get; set; }
+        public float F { get; set; }
 
         public Node(CellInfo cell, Node parent, int move)
         {
             this.cellInfo = cell;
             this.parentNode= parent;
             this.direction = move;
+            this.G = 0f;
+            this.H = 0f;
+            this.F = 0f;
         }
 
         public object Clone()
