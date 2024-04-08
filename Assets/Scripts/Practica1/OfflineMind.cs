@@ -244,7 +244,7 @@ public class OfflineMind : AbstractPathMind
                 {
                     Node neighbourNode = new Node(neighbourCells[i], currentNode, i);
 
-                    // Si el vecino ya está en la lista cerrada, lo ignoramos
+                    // Si el vecino ya estï¿½ en la lista cerrada, lo ignoramos
                     if (closedList.Any(node => node.cellInfo == neighbourNode.cellInfo))
                     {
                         continue;
@@ -255,7 +255,7 @@ public class OfflineMind : AbstractPathMind
                     neighbourNode.H = Vector2.Distance(neighbourNode.cellInfo.GetPosition, goals[0].GetPosition);
                     neighbourNode.F = neighbourNode.G + neighbourNode.H;
 
-                    // Si el vecino está en la lista abierta y su nuevo costo F es más alto, lo ignoramos
+                    // Si el vecino estï¿½ en la lista abierta y su nuevo costo F es mï¿½s alto, lo ignoramos
                     if (openList.Any(node => node.cellInfo == neighbourNode.cellInfo) && neighbourNode.F > currentNode.F)
                     {
                         continue;
@@ -267,7 +267,7 @@ public class OfflineMind : AbstractPathMind
             }
         }
 
-        // Si llegamos a este punto, no se encontró un camino
+        // Si llegamos a este punto, no se encontrï¿½ un camino
         return null;
     }
 

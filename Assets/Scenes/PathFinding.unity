@@ -291,7 +291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1faf82467ff9dca47947f3b5801cc375, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Algorith_Option: 0
+  algorithOption: 3
 --- !u!850595691 &1155724138
 LightingSettings:
   m_ObjectHideFlags: 0
