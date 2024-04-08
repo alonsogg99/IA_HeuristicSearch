@@ -15,9 +15,15 @@ public class OnlineMind : AbstractPathMind
     Node finalNode = null;
     Node parentNode = null;
 
-    bool first_time = false; //?Se refiere a la primera vez que realizamos la busqueda?
+    bool first_time = false;
 
     double tiempo_inicio = 0;
+
+    public List<EnemyBehaviour> Enemies
+        {
+            get { return GameObject.FindObjectsOfType<EnemyBehaviour>().ToList(); }
+            set { }
+        }
 
     [SerializeField]
     AlgorithmOnlineOption algorithmOnlineOption;
@@ -27,17 +33,79 @@ public class OnlineMind : AbstractPathMind
         // Debug.Log("Start");
         finalNode = null;
         tiempo_inicio = Time.time;
+
+    }
+
+    public EnemyBehaviour GetClosestEnemy(List<EnemyBehaviour> Enemies){
+        Vector3 shorterPosition = Enemies[0].transform.position;
+
+        EnemyBehaviour bestEnemy = null;
+    
+        foreach(EnemyBehaviour enemy in Enemies){
+            Vector3 enemyPosition = enemy.transform.position;
+
+            if (Vector3.Distance(enemyPosition, this.transform.position) < Vector3.Distance(shorterPosition, this.transform.position)) bestEnemy = enemy;
+        }
+        return bestEnemy; 
     }
 
     public Node ChoosePath_1(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals){
+
+        /*  1º Hacer un array con todos los enemigos DONE
+
+            2º   Cual es el mas cercano al jugador DONE
+
+            3º   LOOP:  Busca la ruta óptima
+                        Se mueve una casilla
+
+            4º   Alcanza a un enemigo y lo elimina. Si quedan enemigos, vuelta al paso 2.
+
+            5º  Calcula la ruta hacia el goal y se mueve.
+        */
+        
+
+
+        Debug.Log("Busqueda General Online");
         double tiempo_total = 0;
         tiempo_total += Time.deltaTime;
-
         List<Node> nodeResponse = new List<Node>();
-        Node startNode = new Node(currentPos, null, -1); //Crea el nodo de inicio con la posicion actual, sin nodo padre y sin direccion de movimiento
+
+        Node startNode = new Node(currentPos, null, -1);
         nodeResponse.Add(startNode);
 
-
+        while (nodeResponse.Count > 0)
+        {
+            Node openNode = nodeResponse[0];
+            tiempo_total += Time.deltaTime;
+            if (openNode.cellInfo != null)
+            {
+                if (openNode.cellInfo == goals[0])
+                {
+                    Debug.Log("Nodos abiertos " + nodeResponse.Count);
+                    Debug.Log("Tiempo transcurrido " + tiempo_total);
+                    return openNode;
+                }
+                else
+                {
+                    CellInfo[] nextCells = openNode.cellInfo.WalkableNeighbours(boardInfo);
+                    for (int i = 0; i < nextCells.Length; i++)
+                    {
+                        if (nextCells[i] != null)
+                        {
+                            if (!nodeResponse.Any(node => node.cellInfo == nextCells[i]))
+                            {
+                                nodeResponse.Add(new Node(nextCells[i], openNode, i));
+                            }
+                        }
+                    }
+                    nodeResponse.Remove(openNode);
+                }
+            }
+            else
+            {
+                nodeResponse.Remove(openNode);
+            }
+        }
         return null;
     }
 
