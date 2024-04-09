@@ -15,6 +15,8 @@ public class OnlineMind : AbstractPathMind
     Node finalNode = null;
     Node parentNode = null;
 
+    bool first = true;
+
     double tiempo_inicio = 0;
 
     public List<EnemyBehaviour> Enemies
@@ -22,6 +24,8 @@ public class OnlineMind : AbstractPathMind
             get { return GameObject.FindObjectsOfType<EnemyBehaviour>().ToList(); }
             set { }
         }
+
+    public EnemyBehaviour closestEnemy;
 
     [SerializeField]
     AlgorithmOnlineOption algorithmOnlineOption;
@@ -31,6 +35,7 @@ public class OnlineMind : AbstractPathMind
         // Debug.Log("Start");
         finalNode = null;
         tiempo_inicio = Time.time;
+
 
     }
 
@@ -58,7 +63,7 @@ public class OnlineMind : AbstractPathMind
 
             4º   Alcanza a un enemigo y lo elimina. Si quedan enemigos, vuelta al paso 2. //TODO Habra que hacer un OnCollisionEnter para eliminar al enemigo de la escena y de la lista
 
-            5º  Calcula la ruta hacia el goal y se mueve.
+            5º  Calcula la ruta hacia el goal y se mueve. //TODO ya esta hecho del offline, pero falta aplicarlo cuando los enemigos están muertos
         */
         
 
@@ -71,9 +76,14 @@ public class OnlineMind : AbstractPathMind
         Node startNode = new Node(currentPos, null, -1);
         nodeResponse.Add(startNode);
 
-        EnemyBehaviour closestEnemy = GetClosestEnemy(Enemies); //Almacenamos el enemigo más cercano a la posición actual del jugador
-
         
+
+        if (first){
+            closestEnemy = GetClosestEnemy(Enemies);
+            first = false;
+        }
+
+        Debug.Log(closestEnemy.name);
 
         while (nodeResponse.Count > 0)
         {
@@ -108,7 +118,6 @@ public class OnlineMind : AbstractPathMind
                 nodeResponse.Remove(openNode);
             }
         }
-
         return null;
     }
 
