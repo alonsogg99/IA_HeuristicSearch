@@ -35,8 +35,6 @@ public class OnlineMind : AbstractPathMind
         // Debug.Log("Start");
         finalNode = null;
         tiempo_inicio = Time.time;
-
-
     }
 
     public EnemyBehaviour GetClosestEnemy(List<EnemyBehaviour> Enemies){
@@ -54,18 +52,17 @@ public class OnlineMind : AbstractPathMind
 
     public Node ChoosePath_1(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals){
 
-        /*  1º Hacer un array con todos los enemigos //*DONE
+        /*  1º Hacer un array con todos los enemigos //* DONE
 
             2º   Cual es el mas cercano al jugador //* DONE
 
             3º   LOOP:  Busca la ruta óptima    //? DONE pero peta
                         Se mueve una casilla
 
-            4º   Alcanza a un enemigo y lo elimina. Si quedan enemigos, vuelta al paso 2. //TODO Habra que hacer un OnCollisionEnter para eliminar al enemigo de la escena y de la lista
+            4º   Alcanza a un enemigo y lo elimina. Si quedan enemigos, vuelta al paso 2. //* DONE
 
-            5º  Calcula la ruta hacia el goal y se mueve. //TODO ya esta hecho del offline, pero falta aplicarlo cuando los enemigos están muertos
+            5º  Calcula la ruta hacia el goal y se mueve. //TODO Hecho, pero falta por solucionar el bug del paso 3.
         */
-        
 
 
         Debug.Log("Busqueda General Online");
@@ -76,7 +73,6 @@ public class OnlineMind : AbstractPathMind
         Node startNode = new Node(currentPos, null, -1);
         nodeResponse.Add(startNode);
 
-        
 
         if (first){
             closestEnemy = GetClosestEnemy(Enemies);
@@ -89,9 +85,33 @@ public class OnlineMind : AbstractPathMind
         {
             Node openNode = nodeResponse[0];
             tiempo_total += Time.deltaTime;
-            if (openNode.cellInfo != null)
+            if (openNode.cellInfo != null && Enemies.Count > 0)
             {
                 if (openNode.cellInfo == Enemies[0].CurrentPosition())
+                {
+                    Debug.Log("Nodos abiertos " + nodeResponse.Count);
+                    Debug.Log("Tiempo transcurrido " + tiempo_total);
+                    return openNode;
+                }
+                else
+                {
+                    CellInfo[] nextCells = openNode.cellInfo.WalkableNeighbours(boardInfo);
+                    for (int i = 0; i < nextCells.Length; i++)
+                    {
+                        if (nextCells[i] != null)
+                        {
+                            if (!nodeResponse.Any(node => node.cellInfo == nextCells[i]))
+                            {
+                                nodeResponse.Add(new Node(nextCells[i], openNode, i));
+                            }
+                        }
+                    }
+                    nodeResponse.Remove(openNode);
+                }
+            }
+            else if (openNode.cellInfo != null && Enemies.Count <= 0)
+            {
+                if (openNode.cellInfo == goals[0])
                 {
                     Debug.Log("Nodos abiertos " + nodeResponse.Count);
                     Debug.Log("Tiempo transcurrido " + tiempo_total);
