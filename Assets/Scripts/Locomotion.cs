@@ -45,7 +45,7 @@ namespace Assets.Scripts
             if (end.ColumnId == 0)
                 return;
             end = Board.CellInfos[end.ColumnId - 1, end.RowId];
-            Debug.Log("Left\n");
+            //Debug.Log("Left\n");
         }
 
         public void MoveUp()
@@ -53,7 +53,7 @@ namespace Assets.Scripts
             if (end.RowId == Board.NumRows)
                 return;
             end = Board.CellInfos[end.ColumnId, end.RowId+1];
-            Debug.Log("Up\n");
+            //Debug.Log("Up\n");
         }
 
         public void MoveDown()
@@ -61,7 +61,7 @@ namespace Assets.Scripts
             if (end.RowId == 0)
                 return;
             end = Board.CellInfos[end.ColumnId, end.RowId - 1];
-            Debug.Log("Down\n");
+            //Debug.Log("Down\n");
         }
 
         public void MoveRight()
@@ -69,7 +69,7 @@ namespace Assets.Scripts
             if (end.ColumnId == Board.NumColumns)
                 return;
             end = Board.CellInfos[end.ColumnId + 1, end.RowId];
-            Debug.Log("Right\n");
+            //Debug.Log("Right\n");
         }
 
         public void KeyControl()

@@ -15,8 +15,6 @@ public class OnlineMind : AbstractPathMind
     Node finalNode = null;
     Node parentNode = null;
 
-    bool first_time = false;
-
     double tiempo_inicio = 0;
 
     public List<EnemyBehaviour> Enemies
@@ -51,14 +49,14 @@ public class OnlineMind : AbstractPathMind
 
     public Node ChoosePath_1(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals){
 
-        /*  1º Hacer un array con todos los enemigos DONE
+        /*  1º Hacer un array con todos los enemigos //*DONE
 
-            2º   Cual es el mas cercano al jugador DONE
+            2º   Cual es el mas cercano al jugador //* DONE
 
-            3º   LOOP:  Busca la ruta óptima
+            3º   LOOP:  Busca la ruta óptima    //? DONE pero peta
                         Se mueve una casilla
 
-            4º   Alcanza a un enemigo y lo elimina. Si quedan enemigos, vuelta al paso 2.
+            4º   Alcanza a un enemigo y lo elimina. Si quedan enemigos, vuelta al paso 2. //TODO Habra que hacer un OnCollisionEnter para eliminar al enemigo de la escena y de la lista
 
             5º  Calcula la ruta hacia el goal y se mueve.
         */
@@ -73,13 +71,17 @@ public class OnlineMind : AbstractPathMind
         Node startNode = new Node(currentPos, null, -1);
         nodeResponse.Add(startNode);
 
+        EnemyBehaviour closestEnemy = GetClosestEnemy(Enemies); //Almacenamos el enemigo más cercano a la posición actual del jugador
+
+        
+
         while (nodeResponse.Count > 0)
         {
             Node openNode = nodeResponse[0];
             tiempo_total += Time.deltaTime;
             if (openNode.cellInfo != null)
             {
-                if (openNode.cellInfo == goals[0])
+                if (openNode.cellInfo == Enemies[0].CurrentPosition())
                 {
                     Debug.Log("Nodos abiertos " + nodeResponse.Count);
                     Debug.Log("Tiempo transcurrido " + tiempo_total);
@@ -106,6 +108,7 @@ public class OnlineMind : AbstractPathMind
                 nodeResponse.Remove(openNode);
             }
         }
+
         return null;
     }
 
@@ -116,19 +119,15 @@ public class OnlineMind : AbstractPathMind
 
     public override Locomotion.MoveDirection GetNextMove(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals)
     {
-        if (!first_time)
+        if (algorithmOnlineOption == AlgorithmOnlineOption.ALGORITHM_1)
         {
-            first_time = true;
-            if (algorithmOnlineOption == AlgorithmOnlineOption.ALGORITHM_1)
-            {
-                finalNode = ChoosePath_1(boardInfo, currentPos, goals);
-            }    
-            else if (algorithmOnlineOption == AlgorithmOnlineOption.ALGORITHM_2)
-            {
-                finalNode = ChoosePath_2(boardInfo, currentPos, goals);
-            }
-
+            finalNode = ChoosePath_1(boardInfo, currentPos, goals);
+        }    
+        else if (algorithmOnlineOption == AlgorithmOnlineOption.ALGORITHM_2)
+        {
+            finalNode = ChoosePath_2(boardInfo, currentPos, goals);
         }
+
 
         bool found_move = false;
         if (finalNode != null)
