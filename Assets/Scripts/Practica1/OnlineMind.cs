@@ -61,9 +61,8 @@ public class OnlineMind : AbstractPathMind
 
             4º   Alcanza a un enemigo y lo elimina. Si quedan enemigos, vuelta al paso 2. //* DONE
 
-            5º  Calcula la ruta hacia el goal y se mueve. //TODO Hecho, pero falta por solucionar el bug del paso 3.
+            5º  Calcula la ruta hacia el goal y se mueve. //* DONE
         */
-
 
         Debug.Log("Busqueda General Online");
         double tiempo_total = 0;
@@ -141,22 +140,72 @@ public class OnlineMind : AbstractPathMind
         return null;
     }
 
-    public Node ChoosePath_2(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals){
+    public Node ChoosePath_HillClimbing(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals){
+        /*  1º Hacer un array con todos los enemigos //*DONE
+
+            2º   Cual es el mas cercano al jugador //*DONE
+
+            3º   LOOP:  Busca el nodo adyacente más cercano al objetivo, no la ruta completa y se mueve a el
+                        
+            4º   Alcanza a un enemigo y lo elimina. Si quedan enemigos, vuelta al paso 2. //*DONE
+
+            5º  Calcula la ruta hacia el goal y se mueve. //*DONE
+        */
+
+        Debug.Log("Busqueda General Online");
+        double tiempo_total = 0;
+        tiempo_total += Time.deltaTime;
+        Node nodeResponse = new Node();
+
+        Node startNode = new Node(currentPos, null, -1);
+        nodeResponse.Add(startNode);
+
+
+        if (first){
+            closestEnemy = GetClosestEnemy(Enemies);
+            first = false;
+        }
+
+        Debug.Log(closestEnemy.name);
+
+        while (nodeResponse.Count > 0)
+        {
+            Node openNode = nodeResponse[0];
+            tiempo_total += Time.deltaTime;
+
+            if (openNode.cellInfo != null && Enemies.Count > 0){
+
+                CellInfo[] nextCells = openNode.cellInfo.WalkableNeighbours(boardInfo);
+                Vector2 closestDistance = Vector2.Distance(nextCells[0].GetPosition, closestEnemy.GetPosition);
+                CellInfo bestCell;
+
+                for (int i = 0; i < nextCells.length; i++){
+                   if (Vector2.Distance(nextCells[i].GetPosition, closestEnemy.GetPosition) < closestDistance){
+                    closestDistance = Vector2.Distance(nextCells[i].GetPosition, closestEnemy.GetPosition);
+                    bestCell = nextCells[i];
+                   }
+                }
+                //* Aqui ya tendriamos la celda a la que movernos
+            }
+            else if (openNode.cellInfo != null && Enemies.Count <= 0){
+                
+            }
+            else{
+                nodeResponse.Remove(openNode);
+            }
+        }
         return null;
     }
 
 
     public override Locomotion.MoveDirection GetNextMove(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals)
     {
-        if (algorithmOnlineOption == AlgorithmOnlineOption.ALGORITHM_1)
-        {
+        if (algorithmOnlineOption == AlgorithmOnlineOption.ALGORITHM_1){
             finalNode = ChoosePath_1(boardInfo, currentPos, goals);
         }    
-        else if (algorithmOnlineOption == AlgorithmOnlineOption.ALGORITHM_2)
-        {
-            finalNode = ChoosePath_2(boardInfo, currentPos, goals);
+        else if (algorithmOnlineOption == AlgorithmOnlineOption.ALGORITHM_2){
+            finalNode = ChoosePath_HillClimbing(boardInfo, currentPos, goals);
         }
-
 
         bool found_move = false;
         if (finalNode != null)
