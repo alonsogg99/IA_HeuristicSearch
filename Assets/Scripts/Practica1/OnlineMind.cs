@@ -133,16 +133,18 @@ public class OnlineMind : AbstractPathMind
     }
 
     public Node ChoosePath_HillClimbing(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals){
-        Debug.Log("Busqueda Hill Climbing");
+        //Debug.Log("Busqueda Hill Climbing");
         double tiempo_total = 0;
         tiempo_total += Time.deltaTime;
         List<Node> nodeResponse = new List<Node>();
+
 
         Node startNode = new Node(currentPos, null, -1);
         nodeResponse.Add(startNode);
 
         if (first){
             closestEnemy = GetClosestEnemy(Enemies);
+            //Debug.Log("Distancia al enemigo: " + Vector2.Distance(closestEnemy.transform.position, this.transform.position));
             first = false;
         }
 
@@ -152,20 +154,26 @@ public class OnlineMind : AbstractPathMind
         if (openNode.cellInfo != null && Enemies.Count > 0){
 
             CellInfo[] nextCells = openNode.cellInfo.WalkableNeighbours(boardInfo);
-            float closestDistance = Vector2.Distance(nextCells[0].GetPosition, closestEnemy.transform.position);
             CellInfo bestCell = nextCells[0];
+            float closestDistance = Vector2.Distance(nextCells[0].GetPosition, closestEnemy.transform.position);
+            int bestIndex = 0;
+            for (int i = 0; i < nextCells.Length; i++){
+                if (nextCells[i] != null){
+                    //*Compruebo la distancia que hay hasta el enemigo desde cada celda valida
+                    float distanceToEnemy = Vector2.Distance(nextCells[i].GetPosition, closestEnemy.transform.position);
 
-            int i = 0;
-
-            for (; i < nextCells.Length; i++){
-                if (Vector2.Distance(nextCells[i].GetPosition, closestEnemy.transform.position) < closestDistance){
-                closestDistance = Vector3.Distance(nextCells[i].GetPosition, closestEnemy.transform.position);
-                bestCell = nextCells[i];
+                    if (distanceToEnemy < closestDistance){
+                        //*Si la que estoy comprobando esta mas cercana que la que tenia guardada anteriormente, la guardo
+                        closestDistance = distanceToEnemy;
+                        bestCell = nextCells[i];
+                        bestIndex = i;
+                    }
                 }
-            }
-            //* Aqui ya tendriamos la celda a la que movernos
-            nodeResponse.Add(new Node(bestCell, openNode, i));
+            } //TODO Lo que pasa es que siempre nos esta devolviendo bestindex = 0, por tanto siempre se mueve hacia arriba.
+
+            //* Aqui ya tendriamos la celda a la que movernos asique creamos y devolvemos un nodo con la informacion de dicha celda
             nodeResponse.Remove(openNode);
+            nodeResponse.Add(new Node(bestCell, openNode, bestIndex));
             return nodeResponse[0];
         }
         else if (openNode.cellInfo != null && Enemies.Count <= 0){
