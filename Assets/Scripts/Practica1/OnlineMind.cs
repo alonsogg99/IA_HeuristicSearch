@@ -25,7 +25,7 @@ public class OnlineMind : AbstractPathMind
             set { }
         }
 
-    public EnemyBehaviour closestEnemy;
+    protected EnemyBehaviour closestEnemy;
 
     [SerializeField]
     AlgorithmOnlineOption algorithmOnlineOption;
@@ -50,7 +50,7 @@ public class OnlineMind : AbstractPathMind
         return bestEnemy; 
     }
 
-    public Node ChoosePath_1(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals){
+    public Node ChoosePath_General_Online(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals){
 
         /*  1º Hacer un array con todos los enemigos //* DONE
 
@@ -99,10 +99,7 @@ public class OnlineMind : AbstractPathMind
                     {
                         if (nextCells[i] != null)
                         {
-                            if (!nodeResponse.Any(node => node.cellInfo == nextCells[i]))
-                            {
-                                nodeResponse.Add(new Node(nextCells[i], openNode, i));
-                            }
+                            if (!nodeResponse.Any(node => node.cellInfo == nextCells[i])) nodeResponse.Add(new Node(nextCells[i], openNode, i));
                         }
                     }
                     nodeResponse.Remove(openNode);
@@ -123,76 +120,59 @@ public class OnlineMind : AbstractPathMind
                     {
                         if (nextCells[i] != null)
                         {
-                            if (!nodeResponse.Any(node => node.cellInfo == nextCells[i]))
-                            {
-                                nodeResponse.Add(new Node(nextCells[i], openNode, i));
-                            }
+                            if (!nodeResponse.Any(node => node.cellInfo == nextCells[i])) nodeResponse.Add(new Node(nextCells[i], openNode, i));
                         }
                     }
                     nodeResponse.Remove(openNode);
                 }
             }
-            else
-            {
-                nodeResponse.Remove(openNode);
-            }
+            else nodeResponse.Remove(openNode);
+
         }
         return null;
     }
 
     public Node ChoosePath_HillClimbing(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals){
-        /*  1º Hacer un array con todos los enemigos //*DONE
-
-            2º   Cual es el mas cercano al jugador //*DONE
-
-            3º   LOOP:  Busca el nodo adyacente más cercano al objetivo, no la ruta completa y se mueve a el
-                        
-            4º   Alcanza a un enemigo y lo elimina. Si quedan enemigos, vuelta al paso 2. //*DONE
-
-            5º  Calcula la ruta hacia el goal y se mueve. //*DONE
-        */
-
-        Debug.Log("Busqueda General Online");
+        Debug.Log("Busqueda Hill Climbing");
         double tiempo_total = 0;
         tiempo_total += Time.deltaTime;
-        Node nodeResponse = new Node();
+        List<Node> nodeResponse = new List<Node>();
 
         Node startNode = new Node(currentPos, null, -1);
         nodeResponse.Add(startNode);
-
 
         if (first){
             closestEnemy = GetClosestEnemy(Enemies);
             first = false;
         }
 
-        Debug.Log(closestEnemy.name);
+        Node openNode = nodeResponse[0];
+        tiempo_total += Time.deltaTime;
 
-        while (nodeResponse.Count > 0)
-        {
-            Node openNode = nodeResponse[0];
-            tiempo_total += Time.deltaTime;
+        if (openNode.cellInfo != null && Enemies.Count > 0){
 
-            if (openNode.cellInfo != null && Enemies.Count > 0){
+            CellInfo[] nextCells = openNode.cellInfo.WalkableNeighbours(boardInfo);
+            float closestDistance = Vector2.Distance(nextCells[0].GetPosition, closestEnemy.transform.position);
+            CellInfo bestCell = nextCells[0];
 
-                CellInfo[] nextCells = openNode.cellInfo.WalkableNeighbours(boardInfo);
-                Vector2 closestDistance = Vector2.Distance(nextCells[0].GetPosition, closestEnemy.GetPosition);
-                CellInfo bestCell;
+            int i = 0;
 
-                for (int i = 0; i < nextCells.length; i++){
-                   if (Vector2.Distance(nextCells[i].GetPosition, closestEnemy.GetPosition) < closestDistance){
-                    closestDistance = Vector2.Distance(nextCells[i].GetPosition, closestEnemy.GetPosition);
-                    bestCell = nextCells[i];
-                   }
+            for (; i < nextCells.Length; i++){
+                if (Vector2.Distance(nextCells[i].GetPosition, closestEnemy.transform.position) < closestDistance){
+                closestDistance = Vector3.Distance(nextCells[i].GetPosition, closestEnemy.transform.position);
+                bestCell = nextCells[i];
                 }
-                //* Aqui ya tendriamos la celda a la que movernos
             }
-            else if (openNode.cellInfo != null && Enemies.Count <= 0){
-                
-            }
-            else{
-                nodeResponse.Remove(openNode);
-            }
+            //* Aqui ya tendriamos la celda a la que movernos
+            nodeResponse.Add(new Node(bestCell, openNode, i));
+            nodeResponse.Remove(openNode);
+            return nodeResponse[0];
+        }
+        else if (openNode.cellInfo != null && Enemies.Count <= 0){
+            
+        }
+        else{
+            nodeResponse.Remove(openNode);
         }
         return null;
     }
@@ -201,7 +181,7 @@ public class OnlineMind : AbstractPathMind
     public override Locomotion.MoveDirection GetNextMove(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals)
     {
         if (algorithmOnlineOption == AlgorithmOnlineOption.ALGORITHM_1){
-            finalNode = ChoosePath_1(boardInfo, currentPos, goals);
+            finalNode = ChoosePath_General_Online(boardInfo, currentPos, goals);
         }    
         else if (algorithmOnlineOption == AlgorithmOnlineOption.ALGORITHM_2){
             finalNode = ChoosePath_HillClimbing(boardInfo, currentPos, goals);

@@ -337,7 +337,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9d29363e30ce44418227e4a367bea4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  algorithmOnlineOption: 0
+  algorithmOnlineOption: 1
 --- !u!1 &1401979015
 GameObject:
   m_ObjectHideFlags: 0
