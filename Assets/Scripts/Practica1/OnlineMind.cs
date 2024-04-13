@@ -168,7 +168,7 @@ public class OnlineMind : AbstractPathMind
             {
                 break;
             }
-            Debug.LogWarning("Horizonte: " + horizonte);
+            //Debug.LogWarning("Horizonte: " + horizonte);
             Node openNode = nodeResponse[0];
             tiempo_total += Time.deltaTime;
             
@@ -219,7 +219,7 @@ public class OnlineMind : AbstractPathMind
                         {
                             if (!nodeResponse.Any(node => node.cellInfo == nextCells[i]) && !closedNodes.Any(node => node.cellInfo == nextCells[i]))
                             {
-                                Debug.LogWarning("Add");
+                                //Debug.LogWarning("Add");
                                 nodeResponse.Add(new Node(nextCells[i], openNode, i));
                                 if (horizonte == 0)
                                 {
@@ -254,11 +254,11 @@ public class OnlineMind : AbstractPathMind
                     }
                     closedNodes.Add(openNode);
                     nodeResponse.Remove(openNode);
-                    Debug.LogWarning("Remove");
+                    //Debug.LogWarning("Remove");
                 }
             }
         }
-        Debug.LogWarning("Devuelve nulo");
+        //Debug.LogWarning("Devuelve nulo");
         return null;
     }
 
