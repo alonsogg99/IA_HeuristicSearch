@@ -142,17 +142,26 @@ public class OnlineMind : AbstractPathMind
         double tiempo_total = 0;
         tiempo_total += Time.deltaTime;
         List<Node> nodeResponse = new List<Node>();
+        List<Node> closedNodes = new List<Node>();
+        List<Node> firstReach = new List<Node>();
+        List<Node> secondReach = new List<Node>();
+        List<Node> thirdReach = new List<Node>();
 
         Node startNode = new Node(currentPos, null, -1);
         nodeResponse.Add(startNode);
 
+        if (Enemies.Count <= 0)
+        {
+            goal_final = true;
+            return ChoosePath_A_Offline(boardInfo, currentPos, goals);
+        }
 
-        if (closestEnemy == null){
+        if (closestEnemy == null)
+        {
             closestEnemy = GetClosestEnemy(Enemies);
         }
 
         Debug.Log(closestEnemy.name);
-        float bestOpt = Mathf.Infinity;
         while (nodeResponse.Count > 0)
         {
             if (closestEnemy == null)
@@ -162,6 +171,28 @@ public class OnlineMind : AbstractPathMind
             Debug.LogWarning("Horizonte: " + horizonte);
             Node openNode = nodeResponse[0];
             tiempo_total += Time.deltaTime;
+            
+            if(horizonte == 0)
+            {
+                openNode = nodeResponse[0];
+            }
+            else if (horizonte == 1)
+            {
+                openNode = firstReach[0];
+                firstReach.Remove(openNode);
+                
+            }
+            else if (horizonte == 2)
+            {
+                openNode = secondReach[0];
+                secondReach.Remove(openNode);
+            }
+            else if (horizonte == 3)
+            {
+                openNode = thirdReach.OrderBy(node => node.F).First();
+                thirdReach.Remove(openNode);
+            }
+
             if (openNode.cellInfo != null && Enemies.Count > 0)
             {
                 Debug.LogWarning("Enemigos hay");
@@ -184,52 +215,46 @@ public class OnlineMind : AbstractPathMind
                     {
                         if (nextCells[i] != null)
                         {
-                            float option = Vector2.Distance(nextCells[i].GetPosition, closestEnemy.transform.position);
-                            if (option < bestOpt)
-                            {
-                                Debug.LogWarning("Best option");
-                                bestOpt = option;
-                                nodeResponse.Insert(0, new Node(nextCells[i], openNode, i));
-                            }
-                            else if (!nodeResponse.Any(node => node.cellInfo == nextCells[i]))
+                            if (!nodeResponse.Any(node => node.cellInfo == nextCells[i]) && !closedNodes.Any(node => node.cellInfo == nextCells[i]))
                             {
                                 Debug.LogWarning("Add");
                                 nodeResponse.Add(new Node(nextCells[i], openNode, i));
+                                if (horizonte == 0)
+                                {
+                                    firstReach.Add(new Node(nextCells[i], openNode, i));
+                                }
+                                else if (horizonte == 1)
+                                {
+                                    secondReach.Add(new Node(nextCells[i], openNode, i));
+                                }
+                                else if (horizonte == 2)
+                                {
+                                    Node neighbourNode = new Node(nextCells[i], openNode, i);
+                                    neighbourNode.G = openNode.G + Vector2.Distance(openNode.cellInfo.GetPosition, neighbourNode.cellInfo.GetPosition);
+                                    neighbourNode.H = Vector2.Distance(neighbourNode.cellInfo.GetPosition, closestEnemy.CurrentPosition().GetPosition);
+                                    neighbourNode.F = neighbourNode.G + neighbourNode.H;
+                                    thirdReach.Add(neighbourNode);
+                                }
                             }
                         }
                     }
+                    if (horizonte == 0)
+                    {
+                        horizonte = 1;
+                    }
+                    else if (firstReach.Count <= 0 && horizonte == 1)
+                    {
+                        horizonte = 2;
+                    }
+                    else if (secondReach.Count <= 0 && horizonte == 2)
+                    {
+                        horizonte = 3;
+                    }
+                    closedNodes.Add(openNode);
                     nodeResponse.Remove(openNode);
                     Debug.LogWarning("Remove");
                 }
             }
-            else if (openNode.cellInfo != null && Enemies.Count <= 0)
-            {
-                Debug.LogWarning("No enemigos");
-                if (openNode.cellInfo == goals[0])
-                {
-                    Debug.Log("Nodos abiertos " + nodeResponse.Count);
-                    Debug.Log("Tiempo transcurrido " + tiempo_total);
-                    goal_final = true;
-                    return openNode;
-                }
-                else
-                {
-                    CellInfo[] nextCells = openNode.cellInfo.WalkableNeighbours(boardInfo);
-                    for (int i = 0; i < nextCells.Length; i++)
-                    {
-                        if (nextCells[i] != null)
-                        {
-                            if (!nodeResponse.Any(node => node.cellInfo == nextCells[i])) nodeResponse.Add(new Node(nextCells[i], openNode, i));
-                        }
-                    }
-                    nodeResponse.Remove(openNode);
-                }
-            }
-            else
-            {
-                nodeResponse.Remove(openNode);
-            }
-            horizonte++;
         }
         Debug.LogWarning("Devuelve nulo");
         return null;
@@ -300,7 +325,6 @@ public class OnlineMind : AbstractPathMind
         return null;
     }
 
-
     public override Locomotion.MoveDirection GetNextMove(BoardInfo boardInfo, CellInfo currentPos, CellInfo[] goals)
     {
         if (!goal_final)
@@ -327,7 +351,7 @@ public class OnlineMind : AbstractPathMind
                     parentNode = parentNode.parentNode;
                 }
 
-                if (parentNode != null && parentNode.parentNode != null && parentNode.parentNode.cellInfo != null)
+                if (parentNode != null)
                 {
                     if (parentNode.parentNode.cellInfo.CellId == currentPos.CellId)
                     {

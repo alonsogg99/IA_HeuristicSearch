@@ -159,7 +159,7 @@ namespace Assets.Scripts
                 MoveNeed = true;
                 
             }
-        }
+         }
 
         public bool MoveNeed { get; set; }
 
