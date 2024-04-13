@@ -195,17 +195,19 @@ public class OnlineMind : AbstractPathMind
 
             if (openNode.cellInfo != null && Enemies.Count > 0)
             {
-                Debug.LogWarning("Enemigos hay");
+               
                 if (openNode.cellInfo.CellId == closestEnemy.CurrentPosition().CellId)
                 {
-                    Debug.LogWarning("Encontrado final");
+                    
                     Debug.Log("Nodos abiertos " + nodeResponse.Count);
                     Debug.Log("Tiempo transcurrido " + tiempo_total);
                     return openNode;
                 }
                 else if (horizonte >= 3)
                 {
-                    Debug.LogWarning("Final horizonte");
+                    
+                    Debug.Log("Nodos abiertos finales " + nodeResponse.Count);
+                    Debug.Log("Tiempo transcurrido final " + tiempo_total);
                     return openNode;
                 }
                 else

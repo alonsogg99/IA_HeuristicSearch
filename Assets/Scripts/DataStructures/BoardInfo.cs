@@ -113,24 +113,35 @@ namespace Assets.Scripts.DataStructures
         private void LayoutEnemiesAtRandom(int numEnemies)
         {
             var emptyCells = this.EmptyCells;
-            
+
 
             //Instantiate objects until the randomly chosen limit objectCount is reached
-            for (var i = 0; i < numEnemies; i++)
+            var i = 0;
+            while ( i < numEnemies)
             {
                 var cell = emptyCells[UnityEngine.Random.Range(0, emptyCells.Count)];
-                
-                var itemInfo = new PlaceableItem("Enemy_" + i, PlaceableItem.ItemType.Enemy);
-                var enemy = GameObject.Instantiate(manager.enemyTile,cell.GetPosition,//new Vector3(cell.GetPosition.x, cell.GetPosition.y, 0),
-                    Quaternion.identity);
-                enemy.name = "Enemy_" + i;
-                enemy.GetComponent<EnemyBehaviour>().BoardManager = manager;
-                var itemlogic = enemy.GetComponentInChildren<ItemLogic>();
-                itemlogic.PlaceableItem = itemInfo;
 
-                
-                emptyCells = this.EmptyCells;
-                GameManager.instance.ActiveEnemies.Add(enemy);
+                if (!cell.Walkable)
+                {
+                    continue;
+                }
+                else
+                {
+                    var itemInfo = new PlaceableItem("Enemy_" + i, PlaceableItem.ItemType.Enemy);
+                    var enemy = GameObject.Instantiate(manager.enemyTile, cell.GetPosition,//new Vector3(cell.GetPosition.x, cell.GetPosition.y, 0),
+                        Quaternion.identity);
+                    enemy.name = "Enemy_" + i;
+                    enemy.GetComponent<EnemyBehaviour>().BoardManager = manager;
+                    var itemlogic = enemy.GetComponentInChildren<ItemLogic>();
+                    itemlogic.PlaceableItem = itemInfo;
+
+
+                    emptyCells = this.EmptyCells;
+                    GameManager.instance.ActiveEnemies.Add(enemy);
+                    i++;
+                }
+
+               
             }
 
         }
