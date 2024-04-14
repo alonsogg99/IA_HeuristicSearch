@@ -20,6 +20,9 @@ public class OnlineMind : AbstractPathMind
 
     double tiempo_inicio = 0;
 
+    int totalnodes = 0;
+    double tiempodefinitivo = 0;
+
     public List<EnemyBehaviour> Enemies
         {
             get { return GameObject.FindObjectsOfType<EnemyBehaviour>().ToList(); }
@@ -139,6 +142,7 @@ public class OnlineMind : AbstractPathMind
 
         Debug.Log("Busqueda General Online");
         int horizonte = 0;
+        
         double tiempo_total = 0;
         tiempo_total += Time.deltaTime;
         List<Node> nodeResponse = new List<Node>();
@@ -201,6 +205,11 @@ public class OnlineMind : AbstractPathMind
                     
                     Debug.Log("Nodos abiertos " + nodeResponse.Count);
                     Debug.Log("Tiempo transcurrido " + tiempo_total);
+                    totalnodes += nodeResponse.Count;
+                    tiempodefinitivo += tiempo_total;
+                    Debug.Log("Total de nodos utilizados: " + totalnodes);
+                    Debug.Log("Tiempo total de ejecución: " + tiempodefinitivo + " segundos");
+
                     return openNode;
                 }
                 else if (horizonte >= 3)
@@ -208,6 +217,10 @@ public class OnlineMind : AbstractPathMind
                     
                     Debug.Log("Nodos abiertos finales " + nodeResponse.Count);
                     Debug.Log("Tiempo transcurrido final " + tiempo_total);
+                    totalnodes += nodeResponse.Count;
+                    tiempodefinitivo += tiempo_total;
+                    Debug.Log("Total de nodos utilizados: " + totalnodes);
+                    Debug.Log("Tiempo total de ejecución: " + tiempodefinitivo+ " segundos");
                     return openNode;
                 }
                 else
@@ -237,6 +250,7 @@ public class OnlineMind : AbstractPathMind
                                     neighbourNode.F = neighbourNode.G + neighbourNode.H;
                                     thirdReach.Add(neighbourNode);
                                 }
+                                
                             }
                         }
                     }
@@ -259,6 +273,7 @@ public class OnlineMind : AbstractPathMind
             }
         }
         //Debug.LogWarning("Devuelve nulo");
+        
         return null;
     }
 
@@ -268,7 +283,7 @@ public class OnlineMind : AbstractPathMind
         tiempo_total += Time.deltaTime;
         // List<Node> nodeResponse = new List<Node>();
 
-
+        
         Node startNode = new Node(currentPos, null, -1);
         // nodeResponse.Add(startNode);
 
@@ -282,11 +297,15 @@ public class OnlineMind : AbstractPathMind
         // Debug.Log("closestEnemy position " + closestEnemy.transform.position);
 
         // Node openNode = nodeResponse[0];
-        tiempo_total += Time.deltaTime;
+        
 
         // Debug.Log("Enemies Count " + Enemies.Count);
         if (Enemies.Count > 0)
         {
+
+            tiempo_total += Time.deltaTime;
+            tiempodefinitivo += tiempo_total;
+
             CellInfo[] nextCells = startNode.cellInfo.WalkableNeighbours(boardInfo);
             CellInfo bestCell = nextCells[0];
             float closestDistance = Mathf.Infinity;
@@ -307,6 +326,9 @@ public class OnlineMind : AbstractPathMind
                 }
             } //TODO Lo que pasa es que siempre nos esta devolviendo bestindex = 0, por tanto siempre se mueve hacia arriba.
 
+            totalnodes += nextCells.Length;
+
+
             // Debug.Log("Best index " + bestIndex);
 
             //* Aqui ya tendriamos la celda a la que movernos asique creamos y devolvemos un nodo con la informacion de dicha celda
@@ -316,6 +338,8 @@ public class OnlineMind : AbstractPathMind
         }
         else if (Enemies.Count <= 0)
         {
+            Debug.Log("Total de nodos utilizados: " + totalnodes);
+            Debug.Log("Tiempo total de ejecución: " + tiempo_total + " segundos");
             // Debug.Log("Final de enemigos");
             goal_final = true;
             return ChoosePath_A_Offline(boardInfo, currentPos, goals);
